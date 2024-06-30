@@ -1,0 +1,19 @@
+﻿@model List<WeatherForecastDto> 
+
+@{
+    ViewData["Title"] = "WeatherForecasts";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Date</td>
+            <td>@item.Summary</td>
+            <td>@item.TemperatureC</td>
+            <td>@item.TemperatureF</td>
+        </tr>
+    }
+</table>
