@@ -8,10 +8,12 @@ namespace Smooth.Shop.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
@@ -28,7 +30,8 @@ namespace Smooth.Shop.Controllers
         {
             using var httpClient = new HttpClient();
 
-            var result = await httpClient.GetAsync("https://localhost:7084/weatherforecasts");
+            var apiUri = $"{_configuration["FlauntApi:Uri"]}/weatherforecasts";
+            var result = await httpClient.GetAsync(apiUri);
 
             if (result.IsSuccessStatusCode)
             {
