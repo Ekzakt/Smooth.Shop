@@ -1,3 +1,7 @@
+using Smooth.Shop.Application.Configuration;
+using Smooth.Shop.Application.Contracts;
+using Smooth.Shop.Infrastructure.Services;
+
 namespace Smooth.Shop
 {
     public class Program
@@ -6,16 +10,20 @@ namespace Smooth.Shop
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.Configure<RouteOptions>(options =>
+            {
+                options.LowercaseUrls = true;
+            });
             builder.Services.AddControllersWithViews();
+            builder.Services.AddSingleton<ITokenService, TokenService>();
+            builder.Services.Configure<IdentityServerOptions>(builder.Configuration.GetSection(IdentityServerOptions.SectionName));
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
