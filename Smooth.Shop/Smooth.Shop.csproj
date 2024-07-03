@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Smooth.Shop.Application\Smooth.Shop.Application.csproj" />
-    <ProjectReference Include="..\..\Smooth.Shop.Infrastructure\Smooth.Shop.Infrastructure.csproj" />
+    <ProjectReference Include="..\Smooth.Shop.Application\Smooth.Shop.Application.csproj" />
+    <ProjectReference Include="..\Smooth.Shop.Infrastructure\Smooth.Shop.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
