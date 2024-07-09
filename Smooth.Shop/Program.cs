@@ -1,7 +1,3 @@
-using Smooth.Shop.Application.Configuration;
-using Smooth.Shop.Application.Contracts;
-using Smooth.Shop.Infrastructure.Services;
-
 namespace Smooth.Shop
 {
     public class Program
@@ -14,12 +10,34 @@ namespace Smooth.Shop
             {
                 options.LowercaseUrls = true;
             });
+
             builder.Services.AddControllersWithViews();
-            builder.Services.AddSingleton<ITokenService, TokenService>();
-            builder.Services.Configure<IdentityServerOptions>(builder.Configuration.GetSection(IdentityServerOptions.SectionName));
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = "Cookies";
+                options.DefaultChallengeScheme = "oidc";
+            })
+            .AddCookie("Cookies")
+            .AddOpenIdConnect("oidc", options =>
+            {
+                options.Authority = "https://localhost:5001";
+
+                options.ClientId = "MvcDemo";
+                options.ClientSecret = "secret";
+                options.ResponseType = "code";
+
+                options.Scope.Clear();
+                options.Scope.Add("openid");
+                options.Scope.Add("profile");
+
+                options.MapInboundClaims = false; // Don't rename claim types
+
+                options.SaveTokens = true;
+            });
+
 
             var app = builder.Build();
-
 
             if (!app.Environment.IsDevelopment())
             {
@@ -33,10 +51,12 @@ namespace Smooth.Shop
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthorization();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+            app
+                .MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
         }

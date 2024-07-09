@@ -38,7 +38,7 @@ public class TokenService : ITokenService
 
         if (tokenResponse.IsError)
         {
-            _logger.LogError("Unable to get token: {TokenResponse}.", tokenResponse.Exception.Message);
+            _logger.LogError("Unable to get token: {TokenResponse}.", tokenResponse.Exception?.Message ?? "No exception message.");
             throw new InvalidOperationException("Unable to get discovery document.");
         }
 
