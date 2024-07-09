@@ -1,119 +1,65 @@
-﻿using Microsoft.AspNetCore.CookiePolicy;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Smooth.Shop.Data;
+using Smooth.Shop.Application.Configuration;
 
-namespace Smooth.Shop;
-
-public class Program
+namespace Smooth.Shop
 {
-    public static void Main(string[] args)
+    public class Program
     {
-        var builder = WebApplication.CreateBuilder(args);
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddDataProtection()
-            .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\EricJansen"))
-            .SetApplicationName("SharedCookieApp");
-
-        builder.Services.ConfigureApplicationCookie(options => {
-            options.Cookie.Name = ".AspNet.SharedCookie";
-        });
-
-        // Cookies
-        //builder.Services.AddDataProtection()
-        //    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\EricJansen"))
-        //    .SetApplicationName("SmoothApp");
-
-        //builder.Services.ConfigureApplicationCookie(options =>
-        //{
-        //    //options.ClaimsIssuer = "SharedCookieApp";
-        //    options.Cookie.Name = ".AspNet.SmoothCookie";
-        //    options.Cookie.Path = "/";
-        //    options.Cookie.HttpOnly = true;
-        //    options.Cookie.IsEssential = true;
-        //    options.Cookie.Domain = "localhost";
-        //    options.Cookie.SameSite = SameSiteMode.Lax;
-        //    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        //    options.ExpireTimeSpan = TimeSpan.FromDays(1);
-        //});
-
-
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
-
-        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-        builder.Services
-            .AddDefaultIdentity<IdentityUser>(options =>
+            builder.Services.Configure<RouteOptions>(options =>
             {
-                options.SignIn.RequireConfirmedAccount = true;
+                options.LowercaseUrls = true;
+            });
+
+            builder.Services.AddControllersWithViews();
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = "Cookies";
+                options.DefaultChallengeScheme = "oidc";
             })
-            .AddEntityFrameworkStores<ApplicationDbContext>();
-
-
-        builder.Services.AddControllersWithViews();
-
-        var app = builder.Build();
-
-
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseMigrationsEndPoint();
-        }
-        else
-        {
-            app.UseExceptionHandler("/Home/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
-        }
-
-        //app.UseHttpsRedirection();
-        app.UseStaticFiles();
-
-        app.UseRouting();
-
-        app.UseAuthentication();
-        app.UseAuthorization();
-
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Home}/{action=Index}/{id?}");
-
-        app.MapRazorPages();
-
-        app.Run();
-    }
-
-
-    private static void ChangeCookieDomain(AppendCookieContext appendCookieContext, DeleteCookieContext deleteCookieContext)
-    {
-        if (appendCookieContext != null)
-        {
-            // Change the domain of all cookies
-            //appendCookieContext.CookieOptions.Domain = ".abp.io";
-
-            // Change the domain of the specific cookie
-            if (appendCookieContext.CookieName == ".AspNetCore.Culture")
+            .AddCookie("Cookies")
+            .AddOpenIdConnect("oidc", options =>
             {
-                appendCookieContext.CookieOptions.Domain = ".smooth";
-            }
-        }
+                options.Authority = builder.Configuration.GetValue<string>("IdentityServer:Authority");
+                options.ClientId = builder.Configuration.GetValue<string>("IdentityServer:ClientId");
+                options.ClientSecret = builder.Configuration.GetValue<string>("IdentityServer:ClientSecret");
+                options.ResponseType = "code";
 
-        if (deleteCookieContext != null)
-        {
-            // Change the domain of all cookies
-            //appendCookieContext.CookieOptions.Domain = ".abp.io";
+                options.Scope.Clear();
+                options.Scope.Add("openid");
+                options.Scope.Add("profile");
 
-            // Change the domain of the specific cookie
-            if (deleteCookieContext.CookieName == ".AspNetCore.Culture")
+                options.MapInboundClaims = false; // Don't rename claim types
+
+                options.SaveTokens = true;
+            });
+
+
+            var app = builder.Build();
+
+            if (!app.Environment.IsDevelopment())
             {
-                deleteCookieContext.CookieOptions.Domain = ".smooth";
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.UseAuthorization();
+            app.UseAuthorization();
+
+            app
+                .MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.Run();
         }
     }
 }
