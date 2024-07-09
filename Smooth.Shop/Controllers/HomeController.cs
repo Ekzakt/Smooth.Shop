@@ -42,11 +42,11 @@ namespace Smooth.Shop.Controllers
 
             //var token = await _tokenService.GetTokenAsync("flauntapi.read");
 
-            var token = await HttpContext.GetTokenAsync("access_token");
-            httpClient.SetBearerToken(token ?? string.Empty);
-
             try
             {
+                var token = await HttpContext.GetTokenAsync("access_token");
+                httpClient.SetBearerToken(token ?? string.Empty);
+
                 var result = await httpClient.GetAsync(apiUri);
                 var jsonString = await result.Content.ReadAsStringAsync();
                 var jsonData = JsonSerializer.Deserialize<List<WeatherForecastDto>>(jsonString, new JsonSerializerOptions
