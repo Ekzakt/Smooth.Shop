@@ -45,10 +45,9 @@ namespace Smooth.Shop.Controllers
             var token = await HttpContext.GetTokenAsync("access_token");
             httpClient.SetBearerToken(token ?? string.Empty);
 
-            var result = await httpClient.GetAsync(apiUri);
-
-            if (result.IsSuccessStatusCode)
+            try
             {
+                var result = await httpClient.GetAsync(apiUri);
                 var jsonString = await result.Content.ReadAsStringAsync();
                 var jsonData = JsonSerializer.Deserialize<List<WeatherForecastDto>>(jsonString, new JsonSerializerOptions
                 {
@@ -57,9 +56,12 @@ namespace Smooth.Shop.Controllers
 
                 return View(jsonData);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError("Could not get content: {Exception}", ex);
 
-            _logger.LogError("Could not get content: {ReasonPhrase}", result.ReasonPhrase);
-            throw new InvalidOperationException("Could not get content.");
+                return View();
+            }
         }
 
 
