@@ -13,10 +13,12 @@ namespace Smooth.Shop.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
@@ -35,7 +37,9 @@ namespace Smooth.Shop.Controllers
         {
             using var httpClient = new HttpClient();
 
-            var apiUri = "https://localhost:7084/weatherforecasts";
+            var apiBaseUri = _configuration.GetValue<string>("FlauntApi:BaseUri");
+            var apiUri = $"{apiBaseUri}/weatherforecasts";
+
             //var token = await _tokenService.GetTokenAsync("flauntapi.read");
 
             var token = await HttpContext.GetTokenAsync("access_token");
