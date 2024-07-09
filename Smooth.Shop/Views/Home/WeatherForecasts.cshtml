@@ -8,14 +8,22 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<table>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.Date</td>
-            <td>@item.Summary</td>
-            <td>@item.TemperatureC</td>
-            <td>@item.TemperatureF</td>
-        </tr>
-    }
-</table>
+@if (Model is null || Model.Count == 0)
+{
+    <p>No weather forecasts could be displayed.</p>
+}
+else
+{
+    <table>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Date</td>
+                <td>@item.Summary</td>
+                <td>@item.TemperatureC</td>
+                <td>@item.TemperatureF</td>
+            </tr>
+        }
+    </table>
+}
+
