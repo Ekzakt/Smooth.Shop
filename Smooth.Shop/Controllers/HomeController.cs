@@ -58,7 +58,7 @@ namespace Smooth.Shop.Controllers
                 return View(jsonData);
             }
 
-            _logger.LogError("Could not get content.");
+            _logger.LogError("Could not get content: {ReasonPhrase}", result.ReasonPhrase);
             throw new InvalidOperationException("Could not get content.");
         }
 
