@@ -1,7 +1,9 @@
 using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smooth.Shop.Application.Contracts;
+using Smooth.Shop.Application.Models;
 using Smooth.Shop.Models;
 using System.Diagnostics;
 using System.Text.Json;
@@ -11,23 +13,16 @@ namespace Smooth.Shop.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IConfiguration _configuration;
-        private readonly ITokenService _tokenService;
 
-
-        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, ITokenService tokenService)
+        public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-            _configuration = configuration;
-            _tokenService = tokenService;
         }
-
 
         public IActionResult Index()
         {
             return View();
         }
-
 
         public IActionResult Privacy()
         {
@@ -40,15 +35,11 @@ namespace Smooth.Shop.Controllers
         {
             using var httpClient = new HttpClient();
 
-            var apiUri = $"{_configuration["FlauntApi:Uri"]}/weatherforecasts";
-            var token = await _tokenService.GetTokenAsync("flauntapi.read");
+            var apiUri = "https://localhost:7084/weatherforecasts";
+            //var token = await _tokenService.GetTokenAsync("flauntapi.read");
 
-            if (token.IsError)
-            {
-
-            }
-
-            httpClient.SetBearerToken(token.AccessToken);
+            var token = await HttpContext.GetTokenAsync("access_token");
+            httpClient.SetBearerToken(token ?? string.Empty);
 
             var result = await httpClient.GetAsync(apiUri);
 
@@ -63,7 +54,22 @@ namespace Smooth.Shop.Controllers
                 return View(jsonData);
             }
 
+            _logger.LogError("Could not get content.");
             throw new InvalidOperationException("Could not get content.");
+        }
+
+
+        [Authorize]
+        public async Task<IActionResult> AuthCookie()
+        {
+            var result = await HttpContext.AuthenticateAsync();
+
+            if (result.Succeeded)
+            {
+                ViewBag.AuthProperties = result.Properties;
+            }
+
+            return View();
         }
 
 
