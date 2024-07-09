@@ -1,3 +1,5 @@
+using Smooth.Shop.Application.Configuration;
+
 namespace Smooth.Shop
 {
     public class Program
@@ -21,10 +23,9 @@ namespace Smooth.Shop
             .AddCookie("Cookies")
             .AddOpenIdConnect("oidc", options =>
             {
-                options.Authority = "https://localhost:5001";
-
-                options.ClientId = "MvcDemo";
-                options.ClientSecret = "secret";
+                options.Authority = builder.Configuration.GetValue<string>("IdentityServer:Authority");
+                options.ClientId = builder.Configuration.GetValue<string>("IdentityServer:ClientId");
+                options.ClientSecret = builder.Configuration.GetValue<string>("IdentityServer:ClientSecret");
                 options.ResponseType = "code";
 
                 options.Scope.Clear();
