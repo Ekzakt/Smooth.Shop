@@ -44,10 +44,26 @@ namespace Smooth.Shop.Controllers
 
             try
             {
+                _logger.LogInformation("Attempting to retrieve access_token.");
                 var token = await HttpContext.GetTokenAsync("access_token");
+
+                if (token == null)
+                {
+                    _logger.LogError("No access_token was found.");
+                }
+
+                _logger.LogInformation("An access_token was found.");
+                _logger.LogInformation("Attempting to set bearer token.");
+
                 httpClient.SetBearerToken(token ?? string.Empty);
 
+                _logger.LogInformation("Bearer token successfully set.");
+                _logger.LogInformation($"Attempting to get data from {apiUri}");
+
                 var result = await httpClient.GetAsync(apiUri);
+
+                result.EnsureSuccessStatusCode();
+
                 var jsonString = await result.Content.ReadAsStringAsync();
                 var jsonData = JsonSerializer.Deserialize<List<WeatherForecastDto>>(jsonString, new JsonSerializerOptions
                 {
