@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smooth.Shop.Application.Contracts;
 using Smooth.Shop.Application.Models;
+using Smooth.Shop.Bogus;
 using Smooth.Shop.Models;
 using System.Diagnostics;
 using System.Text.Json;
@@ -14,16 +15,19 @@ namespace Smooth.Shop.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
+        private readonly ProductData _productData;
 
-        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, ProductData productData)
         {
             _logger = logger;
             _configuration = configuration;
+            _productData = productData;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var products = _productData.GenerateRandomProductData();
+            return View(products);
         }
 
         public IActionResult Privacy()

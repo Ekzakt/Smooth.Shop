@@ -1,4 +1,5 @@
 using Smooth.Shop.Application.Configuration;
+using Smooth.Shop.Bogus;
 
 namespace Smooth.Shop
 {
@@ -8,6 +9,7 @@ namespace Smooth.Shop
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddSingleton<ProductData>();
             builder.Services.Configure<RouteOptions>(options =>
             {
                 options.LowercaseUrls = true;
@@ -27,11 +29,12 @@ namespace Smooth.Shop
                 options.ClientId = builder.Configuration.GetValue<string>("IdentityServer:ClientId");
                 options.ClientSecret = builder.Configuration.GetValue<string>("IdentityServer:ClientSecret");
                 options.ResponseType = "code";
-
+                
                 options.Scope.Clear();
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");
-
+                options.Scope.Add("flauntapi.read");
+                
                 options.MapInboundClaims = false; // Don't rename claim types
 
                 options.SaveTokens = true;
