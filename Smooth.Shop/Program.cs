@@ -22,7 +22,10 @@ namespace Smooth.Shop
                 options.DefaultScheme = "Cookies";
                 options.DefaultChallengeScheme = "oidc";
             })
-            .AddCookie("Cookies")
+            .AddCookie("Cookies", options =>
+            {
+                options.Cookie.Name = "Smooth.Shop";
+            })
             .AddOpenIdConnect("oidc", options =>
             {
                 options.Authority = builder.Configuration.GetValue<string>("IdentityServer:Authority");
