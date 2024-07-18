@@ -25,8 +25,6 @@ namespace Smooth.Shop
             })
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
-                //options.Cookie.SameSite = SameSiteMode.None;
-                //options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.Name = ".AspNet.SharedCookie";
 
                 if (builder.Environment.IsDevelopment())
@@ -56,7 +54,6 @@ namespace Smooth.Shop
                 options.SaveTokens = true;
             });
 
-
             var app = builder.Build();
 
             if (!app.Environment.IsDevelopment())
@@ -64,12 +61,6 @@ namespace Smooth.Shop
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-
-            //app.UseCookiePolicy(new CookiePolicyOptions
-            //{
-            //    Secure = CookieSecurePolicy.Always,
-            //    MinimumSameSitePolicy = SameSiteMode.None
-            //});
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
