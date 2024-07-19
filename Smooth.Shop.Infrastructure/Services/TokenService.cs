@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Smooth.Shop.Application.Configuration;
 using Smooth.Shop.Application.Contracts;
-using System.Reflection.Metadata;
 
 namespace Smooth.Shop.Infrastructure.Services;
 
