@@ -44,6 +44,7 @@ namespace Smooth.Shop
                 options.Scope.Clear();
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");
+                options.Scope.Add("email");
                 options.Scope.Add("offline_access");
                 options.Scope.Add("flauntapi.read");
                 options.GetClaimsFromUserInfoEndpoint = true;
@@ -73,7 +74,7 @@ namespace Smooth.Shop
             app
                 .MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}").RequireAuthorization();
 
             app.Run();
         }
