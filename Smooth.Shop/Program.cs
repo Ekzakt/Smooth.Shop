@@ -27,10 +27,10 @@ namespace Smooth.Shop
             {
                 options.Cookie.Name = ".AspNet.SharedCookie";
 
-                if (builder.Environment.IsDevelopment())
-                {
-                    options.Cookie.Domain = "localhost";
-                }
+                //if (builder.Environment.IsDevelopment())
+                //{
+                //    options.Cookie.Domain = "localhost";
+                //}
             })
             .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
             {
@@ -74,7 +74,7 @@ namespace Smooth.Shop
             app
                 .MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}").RequireAuthorization();
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
         }
