@@ -13,7 +13,7 @@ public class ProductData
             .RuleFor(p => p.Price, f => f.Random.Decimal(1, 1000))
             .RuleFor(p => p.Quantity, f => f.Random.Int(1, 1000))
             .RuleFor(p => p.Category, f => f.Commerce.Categories(1)[0])
-            .RuleFor(p => p.ImageUrl, f => f.Image.LoremFlickrUrl());
+            .RuleFor(p => p.ImageUrl, f => f.Image.LoremFlickrUrl(keywords: "houses, villas, farms"));
 
         return products.Generate(26);
     }
