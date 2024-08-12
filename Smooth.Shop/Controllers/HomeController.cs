@@ -1,9 +1,4 @@
-using IdentityModel.Client;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Smooth.Shop.Application.Contracts;
-using Smooth.Shop.Application.Models;
 using Smooth.Shop.Bogus;
 using Smooth.Shop.Models;
 using System.Diagnostics;
