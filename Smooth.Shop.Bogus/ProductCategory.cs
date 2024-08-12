@@ -1,8 +1,8 @@
-namespace Smooth.Shop.Bogus;
+﻿namespace Smooth.Shop.Bogus;
 
 #nullable disable
 
-public class Product
+public class ProductCategory
 {
     public int Id { get; set; }
 
@@ -10,11 +10,7 @@ public class Product
 
     public string Description { get; set; }
 
-    public decimal Price { get; set; }
-
-    public int Quantity { get; set; }
-
-    public string Category { get; set; }
-
     public string ImageUrl { get; set; }
+
+    public List<Product> Products { get; set; }
 }
