@@ -1,4 +1,4 @@
-namespace Smooth.Shop.Bogus;
+namespace Smooth.Shop.FakeData;
 
 #nullable disable
 

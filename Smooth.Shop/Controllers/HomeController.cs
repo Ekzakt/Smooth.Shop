@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Smooth.Shop.Bogus;
+using Smooth.Shop.FakeData;
 using Smooth.Shop.Models;
 using System.Diagnostics;
 
@@ -26,9 +26,10 @@ namespace Smooth.Shop.Controllers
         }
 
 
-        public IActionResult Privacy()
+        public IActionResult ProductCategories()
         {
-            return View();
+            var categories = new ProductCategoriesData().GenerateRandomProductCategoryData();
+            return View(categories);
         }
 
 

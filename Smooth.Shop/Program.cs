@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Smooth.Shop.Bogus;
+using Smooth.Shop.FakeData;
 
 namespace Smooth.Shop
 {

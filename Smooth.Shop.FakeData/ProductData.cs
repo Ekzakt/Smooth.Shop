@@ -1,6 +1,6 @@
 ﻿using Bogus;
 
-namespace Smooth.Shop.Bogus;
+namespace Smooth.Shop.FakeData;
 
 public class ProductData
 {

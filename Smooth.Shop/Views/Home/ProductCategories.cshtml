@@ -1,0 +1,31 @@
+﻿@model List<ProductCategory>
+
+@{
+    ViewData["Title"] = "Product Categories";
+}
+
+<a class="dropdown-toggle" href="/" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+    Nederlands
+</a>
+
+@if (Model is not null && Model.Count > 0)
+{
+    <ul class="list-group">
+
+        @foreach (var category in Model)
+        {
+            <li class="list-group-item">
+                <input class="form-check-input me-1" type="checkbox" value="@category.Id" aria-label="@category.Name">
+
+                @category.Name
+
+                @if (category.IsNew)
+                {
+                    <span class="badge bg-primary rounded-pill">New</span>
+                }
+            </li>
+        }
+
+    </ul>
+}
+
