@@ -1,5 +1,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
+using Smooth.Shop.Data;
 using Smooth.Shop.FakeData;
 
 namespace Smooth.Shop
@@ -9,14 +13,24 @@ namespace Smooth.Shop
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var environment = builder.Environment;
+
+            IdentityModelEventSource.ShowPII = environment.IsDevelopment(); ;
 
             builder.Services.AddSingleton<ProductData>();
-            builder.Services.Configure<RouteOptions>(options =>
+            builder.Services.Configure<RouteOptions>(routeOptions =>
             {
-                options.LowercaseUrls = true;
+                routeOptions.LowercaseUrls = true;
             });
 
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
+
+            builder.Services.AddDataProtection()
+                .PersistKeysToDbContext<ApplicationDbContext>()
+                .SetApplicationName("SmoothSensation.SharedCookie");
 
             builder.Services.AddAuthentication(options =>
             {
@@ -26,33 +40,31 @@ namespace Smooth.Shop
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
                 options.Cookie.Name = ".AspNet.SharedCookie";
-
-                //if (builder.Environment.IsDevelopment())
-                //{
-                //    options.Cookie.Domain = "localhost";
-                //}
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.Domain = builder.Configuration["IdentityServer:CookieDomain"];
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+                options.SlidingExpiration = true;
             })
             .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
             {
-                options.Authority = builder.Configuration.GetValue<string>("IdentityServer:Authority");
-                options.ClientId = builder.Configuration.GetValue<string>("IdentityServer:ClientId");
-                options.ClientSecret = builder.Configuration.GetValue<string>("IdentityServer:ClientSecret");
-
+                options.Authority = builder.Configuration["IdentityServer:Authority"];
+                options.ClientId = builder.Configuration["IdentityServer:ClientId"];
+                options.ClientSecret = builder.Configuration["IdentityServer:ClientSecret"];
+                options.RequireHttpsMetadata = !environment.IsDevelopment();
+                options.SaveTokens = true;
                 options.ResponseType = "code";
                 options.ResponseMode = "query";
+                options.GetClaimsFromUserInfoEndpoint = true;
+                options.UsePkce = true;
+                options.MapInboundClaims = false;
 
                 options.Scope.Clear();
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");
-                options.Scope.Add("email");
                 options.Scope.Add("offline_access");
                 options.Scope.Add("flauntapi.read");
-                options.GetClaimsFromUserInfoEndpoint = true;
-                options.UsePkce = true;
-
-                options.MapInboundClaims = false; // Don't rename claim types
-
-                options.SaveTokens = true;
             });
 
             var app = builder.Build();

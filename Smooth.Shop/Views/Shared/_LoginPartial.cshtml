@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject IConfiguration _configuration;
+
+@{
+    var isUserAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+    var userName = @User?.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
+    var authorityUri = _configuration["IdentityServer:Authority"];
+
+    var registerUri = $"{authorityUri}/Account/Register";
+    var loginUri = $"{authorityUri}/Account/Login";
+    var logoutUri = $"{authorityUri}/Account/Logout";
+}
+
+<ul class="navbar-nav">
+
+@if (isUserAuthenticated)
+{
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            @userName
+        </a>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="@logoutUri">Logout</a></li>
+        </ul>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" href="@registerUri">Register</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" href="@loginUri">Login</a>
+    </li>
+}
+</ul>
