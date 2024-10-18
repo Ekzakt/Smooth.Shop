@@ -1,10 +1,5 @@
-using IdentityModel.Client;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Smooth.Shop.Application.Contracts;
-using Smooth.Shop.Application.Models;
-using Smooth.Shop.Bogus;
+using Smooth.Shop.FakeData;
 using Smooth.Shop.Models;
 using System.Diagnostics;
 
@@ -31,9 +26,10 @@ namespace Smooth.Shop.Controllers
         }
 
 
-        public IActionResult Privacy()
+        public IActionResult ProductCategories()
         {
-            return View();
+            var categories = new ProductCategoriesData().GenerateRandomProductCategoryData();
+            return View(categories);
         }
 
 
