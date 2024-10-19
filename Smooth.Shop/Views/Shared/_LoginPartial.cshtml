@@ -3,7 +3,7 @@
 
 @{
     var isUserAuthenticated = User?.Identity?.IsAuthenticated ?? false;
-    var userName = @User?.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
+    var userName = @User?.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
     var authorityUri = _configuration["IdentityServer:Authority"];
 
     var registerUri = $"{authorityUri}/Account/Register";
