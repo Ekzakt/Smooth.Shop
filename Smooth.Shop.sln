@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Smooth.Shop.Infrastructure"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{163B6FBA-B9D7-4100-9981-10348D10165D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Smooth.Shared", "..\Smooth.Shared\src\Smooth.Shared\Smooth.Shared.csproj", "{7DE56265-EF7F-4504-9843-D9DBE3AB1C0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{95BC26A7-EFCF-48F3-91E6-F7AC4E23AEB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95BC26A7-EFCF-48F3-91E6-F7AC4E23AEB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95BC26A7-EFCF-48F3-91E6-F7AC4E23AEB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DE56265-EF7F-4504-9843-D9DBE3AB1C0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DE56265-EF7F-4504-9843-D9DBE3AB1C0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DE56265-EF7F-4504-9843-D9DBE3AB1C0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DE56265-EF7F-4504-9843-D9DBE3AB1C0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{EFD5AF87-1DC1-4624-A74E-B3406825900D} = {C54AF4AA-2C52-4D2B-840C-74F4FC66F493}
 		{2194D30C-0502-465B-B90B-D359963EE067} = {C54AF4AA-2C52-4D2B-840C-74F4FC66F493}
 		{95BC26A7-EFCF-48F3-91E6-F7AC4E23AEB8} = {C54AF4AA-2C52-4D2B-840C-74F4FC66F493}
+		{7DE56265-EF7F-4504-9843-D9DBE3AB1C0C} = {C54AF4AA-2C52-4D2B-840C-74F4FC66F493}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AAAB33B6-9415-4E09-8DC5-6E96545BAD8C}
