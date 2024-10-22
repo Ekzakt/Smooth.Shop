@@ -1,0 +1,3 @@
+[submodule "Smooth.Shared"]
+	path = Smooth.Shared
+	url = https://github.com/ekzakt/Smooth.Shared.git
