@@ -1,5 +1,3 @@
-name: Build and deploy ASP.Net Core app to Azure Web App - app-smooth-shop-stage
-
 on:
   push:
     branches:
@@ -11,31 +9,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository (without submodules)
+        uses: actions/checkout@v2
+        with:
+          submodules: false  # We'll manually handle submodule placement later
 
-      - name: Check working directory
-        run: pwd
+      - name: Clone Smooth.Shared submodule in the correct location
+        run: |
+          git clone https://github.com/Ekzakt/Smooth.Shared ../Smooth.Shared
 
-      - name: List files in workspace
-        run: ls -R ${{ github.workspace }}
-  
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.x'
           include-prerelease: true
-  
+
+      - name: Print working directory
+        run: pwd
+
+      - name: List files in workspace
+        run: ls -R ${{ github.workspace }}
+
+      # Restore dependencies, including for submodules
+      - name: Restore dependencies
+        working-directory: ${{ github.workspace }}/src/Smooth.Web
+        run: dotnet restore
+
+      # Build the Smooth.Web project
       - name: Build with dotnet
+        working-directory: ${{ github.workspace }}/src/Smooth.Web
         run: dotnet build --configuration Release
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+      # Publish the Smooth.Web project
+      - name: Publish with dotnet
+        working-directory: ${{ github.workspace }}/src/Smooth.Web
+        run: dotnet publish -c Release -o ${{ github.workspace }}/publish_output
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ${{ github.workspace }}/publish_output
 
   deploy:
     runs-on: ubuntu-latest
