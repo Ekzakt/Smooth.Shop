@@ -32,17 +32,17 @@ jobs:
 
       # Restore dependencies, including for submodules
       - name: Restore dependencies
-        working-directory: ${{ github.workspace }}/src/Smooth.Web
+        working-directory: ${{ github.workspace }}/src/Smooth.Shop
         run: dotnet restore
 
-      # Build the Smooth.Web project
+      # Build the Smooth.Shop project
       - name: Build with dotnet
-        working-directory: ${{ github.workspace }}/src/Smooth.Web
+        working-directory: ${{ github.workspace }}/src/Smooth.Shop
         run: dotnet build --configuration Release
 
-      # Publish the Smooth.Web project
+      # Publish the Smooth.Shop project
       - name: Publish with dotnet
-        working-directory: ${{ github.workspace }}/src/Smooth.Web
+        working-directory: ${{ github.workspace }}/src/Smooth.Shop
         run: dotnet publish -c Release -o ${{ github.workspace }}/publish_output
 
       - name: Upload artifact for deployment job
@@ -64,7 +64,7 @@ jobs:
         with:
           name: .net-app
 
-      - name: Deploy to Azure Web App
+      - name: Deploy to Azure Shop App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
