@@ -1,3 +1,3 @@
-[submodule "src/Smooth.Shared"]
+[submodule "Smooth.Shared"]
 	path = src/Smooth.Shared
 	url = https://github.com/Ekzakt/Smooth.Shared.git
