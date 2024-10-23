@@ -30,6 +30,10 @@ jobs:
         working-directory: ${{ github.workspace }}/src/Smooth.Shop
         run: dotnet restore
 
+      - name: Remove robots.txt on master branch
+        if: github.ref == 'refs/heads/staging'
+        run: rm -f /home/runner/work/Smooth.Web/Smooth.Web/src/Smooth.Web/wwwroot/robots.txt
+        
       - name: Update Build Number
         run: |
           offset=31
