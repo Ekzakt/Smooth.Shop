@@ -1,3 +1,5 @@
+name: Build and deploy ASP.Net Core app to Azure Web App - app-smooth-shop-stage
+
 on:
   push:
     branches:
@@ -10,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout repository (without submodules)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: false  # We'll manually handle submodule placement later
 
@@ -22,30 +24,36 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.x'
-          include-prerelease: true
+          include-prerelease: false
 
-      - name: Print working directory
-        run: pwd
-
-      - name: List files in workspace
-        run: ls -R ${{ github.workspace }}
-
-      # Restore dependencies, including for submodules
-      - name: Restore dependencies
-        working-directory: ${{ github.workspace }}/src/Smooth.Shop
+      - name: Restore dependencies, including for submodule
+        working-directory: ${{ github.workspace }}/src/Smooth.Web
         run: dotnet restore
 
-      # Build the Smooth.Shop project
-      - name: Build with dotnet
+      - name: Update Build Number
+        run: |
+          offset=31
+          runNumber=${{ github.run_number }}
+          versionNumber=$((runNumber - offset))
+          echo "The offset number is $offset."
+          echo "The run number is $runNumber."
+          echo "The version number is $versionNumber."
+          projects=(
+            "/home/runner/work/Smooth.Shop/Smooth.Shop/src/Smooth.Shop/Smooth.Shop.csproj"
+          )
+          for project in "${projects[@]}"; do
+            sed -i "s/\(<Version>\([0-9]\+\.\)\{2\}\)\([0-9]\+\)/\1$versionNumber/" "$project"
+          done
+          
+      - name: Build Smooth.Shop project
         working-directory: ${{ github.workspace }}/src/Smooth.Shop
         run: dotnet build --configuration Release
 
-      # Publish the Smooth.Shop project
-      - name: Publish with dotnet
+      - name: Publish Smooth.Shop project
         working-directory: ${{ github.workspace }}/src/Smooth.Shop
         run: dotnet publish -c Release -o ${{ github.workspace }}/publish_output
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
