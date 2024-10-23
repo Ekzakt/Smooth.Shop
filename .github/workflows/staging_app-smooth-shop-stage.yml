@@ -27,7 +27,7 @@ jobs:
           include-prerelease: false
 
       - name: Restore dependencies, including for submodule
-        working-directory: ${{ github.workspace }}/src/Smooth.Web
+        working-directory: ${{ github.workspace }}/src/Smooth.Shop
         run: dotnet restore
 
       - name: Update Build Number
