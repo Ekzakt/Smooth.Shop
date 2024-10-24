@@ -16,9 +16,10 @@ jobs:
         with:
           submodules: false  # We'll manually handle submodule placement later
 
-      - name: Clone Smooth.Shared submodule in the correct location
+      - name: Clone submodules in the correct location
         run: |
           git clone https://github.com/Ekzakt/Smooth.Shared ../Smooth.Shared
+          git clone https://github.com/Ekzakt/Smooth.Shared ../Smooth.Shared.Razor
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
@@ -31,8 +32,8 @@ jobs:
         run: dotnet restore
 
       - name: Remove robots.txt on master branch
-        if: github.ref == 'refs/heads/staging'
-        run: rm -f /home/runner/work/Smooth.Web/Smooth.Web/src/Smooth.Web/wwwroot/robots.txt
+        if: github.ref == 'refs/heads/master'
+        run: rm -f /home/runner/work/Smooth.Shop/Smooth.Shop/src/Smooth.Shop/wwwroot/robots.txt
         
       - name: Update Build Number
         run: |
