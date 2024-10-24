@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\Smooth.Shared\src\Smooth.Shared.Razor\Smooth.Shared.Razor.csproj" />
         <ProjectReference Include="..\..\..\Smooth.Shared\src\Smooth.Shared\Smooth.Shared.csproj" />
         <ProjectReference Include="..\Smooth.Shop.Application\Smooth.Shop.Application.csproj" />
         <ProjectReference Include="..\Smooth.Shop.FakeData\Smooth.Shop.FakeData.csproj" />
