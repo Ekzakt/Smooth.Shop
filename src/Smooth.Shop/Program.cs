@@ -64,7 +64,7 @@ public class Program
             options.ClientId = builder.Configuration["IdentityServer:ClientId"];
             options.ClientSecret = builder.Configuration["IdentityServer:ClientSecret"];
             options.RequireHttpsMetadata = !environment.IsDevelopment();
-            options.SaveTokens = true;
+            options.SaveTokens = false;
             options.ResponseType = OpenIdConnectResponseType.Code;
             options.ResponseMode = OpenIdConnectResponseMode.Query;
             options.GetClaimsFromUserInfoEndpoint = true;
