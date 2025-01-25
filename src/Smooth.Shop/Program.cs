@@ -69,7 +69,7 @@ public class Program
 #endif
 
         builder.Services.AddDbContext<IdentityDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnectionString")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityServerConnectionString")));
 
         builder.Services.AddDataProtection()
             .PersistKeysToDbContext<IdentityDbContext>()
