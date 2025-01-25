@@ -364,3 +364,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 /Smooth.Shop/appsettings.Development.json
+/src/Smooth.Shop/appsettings.Development.json
