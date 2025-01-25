@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Smooth.Shop.Data;
 
-public class ApplicationDbContext : DbContext, IDataProtectionKeyContext
+public class IdentityDbContext : DbContext, IDataProtectionKeyContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    public IdentityDbContext(DbContextOptions<IdentityDbContext> options)
         : base(options)
     {
     }

@@ -68,11 +68,11 @@ public class Program
         });
 #endif
 
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
+        builder.Services.AddDbContext<IdentityDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnectionString")));
 
         builder.Services.AddDataProtection()
-            .PersistKeysToDbContext<ApplicationDbContext>()
+            .PersistKeysToDbContext<IdentityDbContext>()
             .SetApplicationName("SmoothSensation.SharedCookie");
 
         builder.Services.AddAuthentication(options =>
