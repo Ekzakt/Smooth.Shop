@@ -1,0 +1,155 @@
+﻿@{
+    ViewData["Title"] = "File Upload";
+}
+<h2>File Upload</h2>
+
+<form id="fileUploadForm">
+    @Html.AntiForgeryToken()
+    <input type="file" id="fileInput" multiple />
+    <div id="progressContainer"></div>
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+
+<script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/uploadHub")
+        .build();
+
+    let connectionId;
+
+    connection.start().then(() => {
+        connection.invoke("GetConnectionId").then(id => {
+            connectionId = id;
+        });
+    }).catch(err => console.error(err));
+
+    connection.on("ReceiveProgress", (data) => {
+        console.log("data = " + JSON.stringify(data));
+        const progressElement = document.getElementById(`progress-${data.fileId}`);
+        if (progressElement) {
+            progressElement.value = data.percentageDone; // Update individual progress bar
+        }
+    });
+
+    document.getElementById("fileInput").addEventListener("change", async () => {
+
+        const files = document.getElementById("fileInput").files;
+
+        if (!files || files.length === 0) return;
+
+        const formEl = document.getElementById("fileUploadForm");
+        const progressContainer = document.getElementById("progressContainer");
+        const token = formEl.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        progressContainer.innerHTML = "";
+
+        for (let i = 0; i < files.length; i++) {
+
+            const file = files[i];
+            const fileId = `file${i}`;
+
+            const progressWrapper = document.createElement("div");
+            progressWrapper.style.marginBottom = "10px";
+
+            const fileLabel = document.createElement("span");
+            fileLabel.textContent = `Uploading: ${file.name}`;
+
+            const progressBar = document.createElement("progress");
+            progressBar.id = `progress-${fileId}`;
+            progressBar.max = 100;
+            progressBar.value = 0;
+            progressBar.style.display = "block";
+            progressBar.style.width = "100%";
+
+            progressWrapper.appendChild(fileLabel);
+            progressWrapper.appendChild(progressBar);
+            progressContainer.appendChild(progressWrapper);
+
+            uploadFile(file, token, connectionId, fileId);
+        }
+    });
+
+
+    async function uploadFile(file, token, connectionId, fileId) {
+
+        const formData = new FormData();
+
+        formData.append("file", file);
+        formData.append("connectionId", connectionId);
+        formData.append("fileId", fileId);
+
+        try {
+            const response = await fetch("/Upload/Save", {
+                method: "POST",
+                headers: {
+                    "RequestVerificationToken": token
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                console.log(`File ${file.name} uploaded successfully!`);
+                document.getElementById(`progress-${fileId}`).value = 100; // Set progress to 100%
+            } else {
+                const errorData = await response.json();
+                console.error(`Error uploading file ${file.name}:`, errorData.message);
+                alert(`Error uploading ${file.name}: ${errorData.message}`);
+            }
+        } catch (err) {
+            console.error(`An error occurred while uploading file ${file.name}:`, err);
+            alert(`An error occurred while uploading ${file.name}`);
+        }
+    }
+</script>
+
+@* <script>
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/uploadHub")
+        .build();
+
+    let connectionId;
+
+    connection.start().then(() => {
+        connection.invoke("GetConnectionId").then(id => {
+            connectionId = id;
+        });
+    }).catch(err => console.error(err));
+
+    connection.on("ReceiveProgress", (progress) => {
+        document.getElementById("uploadProgress").value = progress;
+    });
+
+    document.getElementById("fileInput").addEventListener("change", async () => {
+
+        const fileInput = document.getElementById("fileInput");
+        const file = fileInput.files[0];
+
+        if (!file) return;
+
+        const form = document.getElementById("fileUploadForm");
+        const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+        const formData = new FormData();
+
+        formData.append("file", file);
+        formData.append("connectionId", connectionId);
+
+        const response = await fetch("/Upload/Save", {
+            method: "POST",
+            headers: {
+                "RequestVerificationToken": token // Pass the token as a header
+            },
+            body: formData
+        });
+
+        if (response.ok) {
+            document.getElementById("uploadProgress").value = 0;
+        } else {
+            const errorData = await response.json();
+            console.error(`Error Status: ${response.status}, Message: ${errorData.message}`);
+            alert(`Error: ${errorData.message}`);
+        }
+    });
+
+</script> *@
