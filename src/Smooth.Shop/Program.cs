@@ -1,12 +1,19 @@
+using Azure.Identity;
+using Ekzakt.FileManager.AzureBlob.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Smooth.Shared.Configuration;
+using Smooth.Shop.Configuration;
 using Smooth.Shop.Data;
 using Smooth.Shop.FakeData;
+using Smooth.Shop.Hubs;
 
 namespace Smooth.Shop;
 
@@ -20,6 +27,7 @@ public class Program
         IdentityModelEventSource.ShowPII = environment.IsDevelopment(); ;
 
         builder.Services.AddSingleton<ProductData>();
+        builder.Services.AddEkzaktFileManagerAzure();
 
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
@@ -34,6 +42,31 @@ public class Program
         });
 
         builder.Services.AddControllersWithViews();
+        builder.Services.AddSignalR();
+
+        builder.Services
+                .AddAzureClients(clientBuilder => {
+                    clientBuilder
+                        .UseCredential(new DefaultAzureCredential());
+                    clientBuilder
+                        .AddBlobServiceClient(builder.Configuration.GetSection(AzureStorageOptions.SectionName));
+                    clientBuilder
+                        .ConfigureDefaults(builder.Configuration.GetSection(AzureDefaultsOptions.SectionName));
+                });
+
+        builder.AddAzureKeyVault();
+
+        builder.Services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = 1024 * 1024 * 256;
+        });
+
+#if DEBUG
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Limits.MaxRequestBodySize = 1024 * 1024 * 1024; // 1 GB
+        });
+#endif
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
@@ -97,6 +130,7 @@ public class Program
         app.UseAuthorization();
         app.UseAuthorization();
 
+        app.MapHub<UploadHub>("/uploadHub");
         app
             .MapControllerRoute(
                 name: "default",
