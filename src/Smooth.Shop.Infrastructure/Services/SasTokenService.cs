@@ -29,7 +29,7 @@ public class SasTokenService : ISasTokenService
         {
             var sasToken = GenerateContainerSasToken("data");
             var sasTokenBaseUrl = $"https://{_azureStorageOptions.AccountName}.blob.core.windows.net/{"data"}/";
-            var sasTokenUrl = $"{sasTokenBaseUrl}{sasTokenRequest.FileName.ToLower()}?{sasToken}";
+            var sasTokenUrl = $"{sasTokenBaseUrl}{sasTokenRequest.FileName.ToLower()}?{sasToken}&uid=ericjansen";
 
             return new SasTokenResponse
             {
