@@ -10,10 +10,12 @@ using Microsoft.Extensions.Azure;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Smooth.Shared.Configuration;
+using Smooth.Shop.Application.Contracts;
 using Smooth.Shop.Configuration;
 using Smooth.Shop.Data;
 using Smooth.Shop.FakeData;
 using Smooth.Shop.Hubs;
+using Smooth.Shop.Infrastructure.Services;
 
 namespace Smooth.Shop;
 
@@ -28,6 +30,11 @@ public class Program
 
         builder.Services.AddSingleton<ProductData>();
         builder.Services.AddEkzaktFileManagerAzure();
+
+        builder.Services
+            .AddOptions<AzureStorageOptions>()
+            .BindConfiguration(AzureStorageOptions.SectionName);
+        builder.Services.AddTransient<ISasTokenService, SasTokenService>();
 
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {

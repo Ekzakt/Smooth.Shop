@@ -1,7 +1,7 @@
 ﻿@{
-    ViewData["Title"] = "File Upload";
+    ViewData["Title"] = "File Upload Old";
 }
-<h2>File Upload</h2>
+<h2>@ViewData["Title"]</h2>
 
 <form id="fileUploadForm">
     @Html.AntiForgeryToken()
@@ -80,7 +80,7 @@
         formData.append("fileId", fileId);
 
         try {
-            const response = await fetch("/Upload/Save", {
+            const response = await fetch("/File/Save", {
                 method: "POST",
                 headers: {
                     "RequestVerificationToken": token
