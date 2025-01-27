@@ -43,7 +43,7 @@ public class FileController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Sas(string fileId, CancellationToken cancellationToken)
+    public IActionResult Sas(string fileId, CancellationToken cancellationToken)
     {
         var request = new SasTokenRequest
         {
