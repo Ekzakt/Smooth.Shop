@@ -43,20 +43,18 @@ public class FileController : Controller
     }
 
     [HttpGet]
-    public IActionResult Sas(string fileId, CancellationToken cancellationToken)
+    public IActionResult Sas(string fileName, CancellationToken cancellationToken)
     {
         var request = new SasTokenRequest
         {
-            StorageAccountName = _azureStorageOptions.AccountName,
-            StorageAccountKey = _azureStorageOptions.AccountKey,
-            ContainerName = "data"
+            FileName = fileName
         };
 
         var response = _sasTokenService.GenerateSasToken(request);
 
         if (response.Success)
         { 
-            return Ok(new { sasToken = response.SasTokon });
+            return Ok(response);
         }
 
         return new JsonResult(response);

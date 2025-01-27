@@ -3,11 +3,21 @@ using Azure.Storage;
 using Smooth.Shop.Application.Contracts;
 using Smooth.Shop.Application.Responses;
 using Smooth.Shop.Application.Requests;
+using Microsoft.Extensions.Options;
+using Smooth.Shared.Configuration;
 
 namespace Smooth.Shop.Infrastructure.Services;
 
 public class SasTokenService : ISasTokenService
 {
+    private readonly AzureStorageOptions _azureStorageOptions;
+
+    public SasTokenService(IOptions<AzureStorageOptions> azureStorageOptions)
+    {
+        _azureStorageOptions = azureStorageOptions.Value;
+    }
+
+
     /// <summary>
     /// Generates a SAS token for accessing a specified Azure Blob Storage container.
     /// </summary>
@@ -17,17 +27,16 @@ public class SasTokenService : ISasTokenService
     {
         try
         {
-            var sasToken = GenerateContainerSasToken(
-                sasTokenRequest.StorageAccountName,
-                sasTokenRequest.StorageAccountKey,
-                sasTokenRequest.ContainerName);
-
-            var containerUriWithSas = $"https://{sasTokenRequest.StorageAccountName}.blob.core.windows.net/{sasTokenRequest.ContainerName}?{sasToken}";
+            var sasToken = GenerateContainerSasToken("data");
+            var sasTokenBaseUrl = $"https://{_azureStorageOptions.AccountName}.blob.core.windows.net/{"data"}/";
+            var sasTokenUrl = $"{sasTokenBaseUrl}{sasTokenRequest.FileName.ToLower()}?{sasToken}";
 
             return new SasTokenResponse
             {
                 Success = true,
-                SasTokon = sasToken,
+                SasToken = sasToken,
+                SasTokenBaseUrl = sasTokenBaseUrl,
+                SasTokenUrl = sasTokenUrl,
                 Message = "SasToken created successfully."
             };
         }
@@ -50,23 +59,24 @@ public class SasTokenService : ISasTokenService
     /// <param name="storageAccountKey">The key of the Azure Storage account.</param>
     /// <param name="containerName">The name of the container.</param>
     /// <returns>A SAS token string.</returns>
-    private string GenerateContainerSasToken(string storageAccountName, string storageAccountKey, string containerName)
+    private string GenerateContainerSasToken(string containerName)
     {
         var sasBuilder = new BlobSasBuilder
         {
             BlobContainerName = containerName,
             Resource = "c", // "c" means container-level access
             StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5), // Start time
-            ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)    // Expiry time
+            ExpiresOn = DateTimeOffset.UtcNow.AddHours(5)    // Expiry time
         };
 
         sasBuilder.SetPermissions(BlobContainerSasPermissions.Write |
                                    BlobContainerSasPermissions.Add |
-                                   BlobContainerSasPermissions.Create |
-                                   BlobContainerSasPermissions.Read);
+                                   BlobContainerSasPermissions.Create);
 
-        var storageSharedKeyCredential = new StorageSharedKeyCredential(storageAccountName, storageAccountKey);
+        var storageSharedKeyCredential = new StorageSharedKeyCredential(_azureStorageOptions.AccountName, _azureStorageOptions.AccountKey);
         var sasToken = sasBuilder.ToSasQueryParameters(storageSharedKeyCredential).ToString();
+
+        //var sasTokenUrl = $"{storageAccountName}"
 
         return sasToken;
     }

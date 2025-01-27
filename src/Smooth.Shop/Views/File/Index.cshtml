@@ -3,15 +3,25 @@
 }
 <h2>@ViewData["Title"]</h2>
 
+<form id="fileUploadForm">
+    @Html.AntiForgeryToken()
+    <input type="file" id="fileInput" multiple />
+    <div id="progressContainer"></div>
+</form>
+
 <script>
+
     class SasTokenService {
         constructor(endpoint) {
-            this.endpoint = endpoint; // API endpoint to fetch the SAS token
+            this.endpoint = endpoint;
         }
 
-        getSasToken(callback) {
+        getSasToken(fileName, callback) {
             const xhr = new XMLHttpRequest();
-            xhr.open("GET", this.endpoint, true); // Make a GET request to the endpoint
+            const encodedFileName = encodeURIComponent(fileName);
+            const url = `${this.endpoint}?fileName=${encodedFileName}`;
+
+            xhr.open("GET", url, true);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) { // Check if the request is complete
@@ -19,7 +29,7 @@
                         try {
                             const response = JSON.parse(xhr.responseText); // Parse the JSON response
                             if (callback && typeof callback === "function") {
-                                callback(null, response.sasToken); // Pass the SAS token to the callback
+                                callback(null, response.sasTokenUrl); // Pass the SAS token to the callback
                             }
                         } catch (error) {
                             console.error("Error parsing response:", error);
@@ -41,16 +51,95 @@
         }
     }
 
-    // Example usage:
-    const sasService = new SasTokenService("/file/sas");
 
-    // Fetch the SAS token and handle it via a callback
-    sasService.getSasToken((error, sasToken) => {
-        if (error) {
-            console.error("Error fetching SAS token:", error.message);
-        } else {
-            console.log("SAS Token:", sasToken);
-            // You can now use the SAS token
+    class FileUploader {
+        constructor(sasTokenService) {
+            this.sasTokenService = sasTokenService;
         }
+
+        uploadFile(file, onProgress, onComplete, onError) {
+
+            this.sasTokenService.getSasToken(file.name, (error, sasTokenUrl) => {
+                if (error) {
+                    console.error("Failed to fetch SAS token:", error);
+                    if (onError) onError(error);
+                    return;
+                }
+
+                const xhr = new XMLHttpRequest();
+
+                xhr.open("PUT", sasTokenUrl, true);
+
+                xhr.upload.onprogress = function (event) {
+                    if (event.lengthComputable && onProgress) {
+                        const progress = (event.loaded / event.total) * 100;
+                        onProgress(progress);
+                    }
+                };
+
+                xhr.onload = function () {
+                    if (xhr.status === 200 || xhr.status === 201) {
+                        console.log("File uploaded successfully.");
+                        if (onComplete) onComplete(xhr.responseText);
+                    } else {
+                        console.error("Failed to upload file. Status:", xhr.status);
+                        if (onError) onError(new Error(`Upload failed with status ${xhr.status}`));
+                    }
+                };
+
+                xhr.onerror = function () {
+                    console.error("An error occurred during file upload.");
+                    if (onError) onError(new Error("Network error during file upload."));
+                };
+
+                xhr.setRequestHeader("x-ms-blob-type", "BlockBlob"); // Set required header for Azure Blob Storage
+                xhr.send(file); // Send the file
+            });
+        }
+    }
+
+
+
+    // Example usage:
+
+    const sasService = new SasTokenService("/file/sas");
+    const fileUploader = new FileUploader(sasService);
+
+    // Handle file input change event
+    document.getElementById("fileInput").addEventListener("change", function () {
+
+        const file = this.files[0];
+
+        if (!file) return;
+
+        const progressContainer = document.getElementById("progressContainer");
+        progressContainer.innerHTML = ""; // Clear previous progress bars
+
+        // Create a progress bar for the file
+        const progressBar = document.createElement("progress");
+        progressBar.max = 100;
+        progressBar.value = 0;
+        progressBar.style.width = "100%";
+        progressBar.style.marginTop = "10px";
+        progressContainer.appendChild(progressBar);
+
+        // Upload the file
+        fileUploader.uploadFile(
+            file,
+            (progress) => {
+                // Update progress bar
+                progressBar.value = progress;
+            },
+            (response) => {
+                // Handle successful upload
+                console.log("Upload complete:", response);
+                alert("File uploaded successfully!");
+            },
+            (error) => {
+                // Handle upload error
+                console.error("Error uploading file:", error);
+                alert(`Error: ${error.message}`);
+            }
+        );
     });
 </script>
