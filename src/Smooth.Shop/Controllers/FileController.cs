@@ -3,28 +3,63 @@ using Ekzakt.FileManager.Core.Models.EventArgs;
 using Ekzakt.FileManager.Core.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
+using Smooth.Shared.Configuration;
+using Smooth.Shop.Application.Contracts;
+using Smooth.Shop.Application.Requests;
 using Smooth.Shop.Hubs;
 
 namespace Smooth.Shop.Controllers;
 
-public class UploadController : Controller
+public class FileController : Controller
 {
     private readonly IEkzaktFileManager _fileManager;
     private readonly IHubContext<UploadHub> _hubContext;
+    private readonly ISasTokenService _sasTokenService;
+    private readonly AzureStorageOptions _azureStorageOptions;
 
-
-    public UploadController(
-        IEkzaktFileManager fileManager, 
-        IHubContext<UploadHub> hubContext)
+    public FileController(
+        IEkzaktFileManager fileManager,
+        IHubContext<UploadHub> hubContext,
+        ISasTokenService sasTokenService,
+        IOptions<AzureStorageOptions> azureStorageOptions)
     {
         _fileManager = fileManager;
         _hubContext = hubContext;
+        _sasTokenService = sasTokenService;
+        _azureStorageOptions = azureStorageOptions.Value;
     }
 
 
     public IActionResult Index()
     {
         return View();
+    }
+
+
+    public IActionResult IndexOld()
+    {
+        return View("IndexOld");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Sas(string fileId, CancellationToken cancellationToken)
+    {
+        var request = new SasTokenRequest
+        {
+            StorageAccountName = _azureStorageOptions.AccountName,
+            StorageAccountKey = _azureStorageOptions.AccountKey,
+            ContainerName = "data"
+        };
+
+        var response = _sasTokenService.GenerateSasToken(request);
+
+        if (response.Success)
+        { 
+            return Ok(new { sasToken = response.SasTokon });
+        }
+
+        return new JsonResult(response);
     }
 
 

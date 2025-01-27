@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ekzakt.FileManager.AzureBlob" Version="0.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.1" />
   </ItemGroup>
