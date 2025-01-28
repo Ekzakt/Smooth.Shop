@@ -27,10 +27,16 @@ public class SasTokenService : ISasTokenService
     {
         try
         {
-            var sasToken = GenerateContainerSasToken("data");
-            var sasTokenBaseUrl = $"https://{_azureStorageOptions.AccountName}.blob.core.windows.net/{"data"}/";
+            var sasToken = GenerateContainerSasToken(_azureStorageOptions.ContainerName);
+            var sasTokenBaseUrl = $"{_azureStorageOptions.ServiceUri}/{_azureStorageOptions.ContainerName}/";
             var sasTokenUrl = $"{sasTokenBaseUrl}{sasTokenRequest.FileName.ToLower()}?{sasToken}&uid=ericjansen";
 
+#if DEBUG
+            if (sasTokenUrl.StartsWith("https://"))
+            {
+                sasTokenUrl = sasTokenUrl.Replace("https://", "http://");
+            }
+#endif
             return new SasTokenResponse
             {
                 Success = true,
