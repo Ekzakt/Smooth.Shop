@@ -40,7 +40,7 @@ public class Program
         builder.Services.AddTransient<ISasTokenService, SasTokenService>();
 
         builder.Services.AddDbContext<SmoothWebDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("SmoothWebConnectionString")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("SmoothShopConnectionString")));
 
         builder.Services.AddScoped<INewMediumRepository, NewMediumRepository>();
 
