@@ -29,7 +29,7 @@ public class SasTokenService : ISasTokenService
         {
             var sasToken = GenerateContainerSasToken(_azureStorageOptions.ContainerName);
             var sasTokenBaseUrl = $"{_azureStorageOptions.ServiceUri}/{_azureStorageOptions.ContainerName}/";
-            var sasTokenUrl = $"{sasTokenBaseUrl}{sasTokenRequest.FileName.ToLower()}?{sasToken}&uid=ericjansen";
+            var sasTokenUrl = $"{sasTokenBaseUrl}{sasTokenRequest.FileName.ToLower()}?{sasToken}";
 
 #if DEBUG
             if (sasTokenUrl.StartsWith("https://"))

@@ -2,9 +2,7 @@
 
 #nullable disable
 
-public class SasTokenRequest
+public class UploadConfirmRequest
 {
     public string FileName { get; set; }
-
-    public string ConnectionId { get; set; }
 }

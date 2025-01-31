@@ -3,31 +3,33 @@ using Ekzakt.FileManager.Core.Models.EventArgs;
 using Ekzakt.FileManager.Core.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Options;
-using Smooth.Shared.Configuration;
+using Smooth.Shared.Extensions;
 using Smooth.Shop.Application.Contracts;
 using Smooth.Shop.Application.Requests;
 using Smooth.Shop.Hubs;
+using System.Text.Json;
+using System.Web;
 
 namespace Smooth.Shop.Controllers;
 
 public class FileController : Controller
 {
+    private readonly ILogger<FileController> _logger;
     private readonly IEkzaktFileManager _fileManager;
     private readonly IHubContext<UploadHub> _hubContext;
     private readonly ISasTokenService _sasTokenService;
-    private readonly AzureStorageOptions _azureStorageOptions;
+
 
     public FileController(
+        ILogger<FileController> logger,
         IEkzaktFileManager fileManager,
         IHubContext<UploadHub> hubContext,
-        ISasTokenService sasTokenService,
-        IOptions<AzureStorageOptions> azureStorageOptions)
+        ISasTokenService sasTokenService)
     {
+        _logger = logger;
         _fileManager = fileManager;
         _hubContext = hubContext;
         _sasTokenService = sasTokenService;
-        _azureStorageOptions = azureStorageOptions.Value;
     }
 
 
@@ -42,12 +44,15 @@ public class FileController : Controller
         return View("IndexOld");
     }
 
+
     [HttpGet]
-    public IActionResult Sas(string fileName, CancellationToken cancellationToken)
+    public IActionResult Sas(string fileName, string connectionId, CancellationToken cancellationToken)
     {
         var request = new SasTokenRequest
         {
-            FileName = fileName
+            FileName = GetFileName(
+                HttpUtility.UrlDecode(fileName),
+                HttpUtility.UrlDecode(connectionId)),
         };
 
         var response = _sasTokenService.GenerateSasToken(request);
@@ -74,7 +79,7 @@ public class FileController : Controller
 
         var request = new SaveFileRequest
         {
-            FileName = file.FileName,
+            FileName = GetFileName(file.Name, connectionId),
             FileStream = fileStream,
             ProgressHandler = GetProgressHandler(connectionId, fileId),
             InitialFileSize = fileStream.Length
@@ -90,6 +95,17 @@ public class FileController : Controller
     }
 
 
+    [HttpPost]
+    public IActionResult Confirm([FromBody] UploadConfirmRequest uploadConfirmRequest, CancellationToken cancellationToken)
+    {
+        var result = JsonSerializer.Serialize(uploadConfirmRequest, new JsonSerializerOptions { WriteIndented = true });
+
+        _logger.LogInformation($"Confirming upload of file: {result}");
+
+        return Ok();
+    }
+
+
     #region Helpers
 
     public Progress<ProgressEventArgs> GetProgressHandler(string connectionId, string fileId)
@@ -99,6 +115,20 @@ public class FileController : Controller
             await _hubContext.Clients.Client(connectionId)
                 .SendAsync("ReceiveProgress", new { fileId, progress.PercentageDone });
         });
+    }
+
+
+    private string GetFileName(string originalFileName, string connectionId)
+    {
+        if (string.IsNullOrWhiteSpace(connectionId))
+        {
+            connectionId = "null";
+        }
+
+        var userId = User.GetUserId();
+        var fileName = $"{userId}__{connectionId}__{originalFileName}";
+
+        return fileName;
     }
 
     #endregion Helpers
