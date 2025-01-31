@@ -14,6 +14,9 @@
 
         const sasService = new SasTokenService("/file/sas");
         const fileUploader = new FileUploader(sasService);
+        const signalRService = new SignalRService("/uploadHub");
+
+        signalRService.startConnection();
 
         document.getElementById("fileInput").addEventListener("change", function () {
             const files = this.files;
@@ -27,6 +30,7 @@
 
                 fileUploader.uploadFile(
                     file,
+                    signalRService.getConnectionId(),
                     progressBar,
                     (response) => {
                         console.log(`Upload complete for ${file.name}:`, response);

@@ -40,10 +40,11 @@ class SasTokenService {
         this.endpoint = endpoint;
     }
 
-    getSasToken(fileName, callback) {
+    getSasToken(fileName, connectionId, callback) {
         const xhr = new XMLHttpRequest();
         const encodedFileName = encodeURIComponent(fileName);
-        const url = `${this.endpoint}?fileName=${encodedFileName}`;
+        const encodedConnectionId = encodeURIComponent(connectionId);
+        const url = `${this.endpoint}?fileName=${encodedFileName}&connectionId=${encodedConnectionId}`;
 
         xhr.open("GET", url, true);
 
@@ -80,8 +81,8 @@ class FileUploader {
         this.sasTokenService = sasTokenService;
     }
 
-    uploadFile(file, progressBar, onComplete, onError) {
-        this.sasTokenService.getSasToken(file.name, (error, sasTokenUrl) => {
+    uploadFile(file, connectionId, progressBar, onComplete, onError) {
+        this.sasTokenService.getSasToken(file.name, connectionId, (error, sasTokenUrl) => {
             if (error) {
                 console.error("Failed to fetch SAS token:", error);
                 progressBar.error(error.message);
@@ -123,5 +124,44 @@ class FileUploader {
             xhr.setRequestHeader("x-ms-blob-type", "BlockBlob");
             xhr.send(file);
         });
+    }
+}
+
+
+class SignalRService {
+    constructor(hubUrl) {
+        this.connection = new signalR.HubConnectionBuilder()
+            .withUrl(hubUrl)
+            .withAutomaticReconnect()
+            .build();
+
+        this.connectionId = null;
+        this.onConnectedCallbacks = [];
+    }
+
+    async startConnection() {
+        try {
+            await this.connection.start();
+            this.connectionId = this.connection.connectionId;
+            console.log("Connected to SignalR hub");
+            console.log("Connection ID:", this.connectionId);
+
+            this.onConnectedCallbacks.forEach(callback => callback(this.connectionId));
+        } catch (err) {
+            console.error("Error connecting to SignalR:", err);
+        }
+    }
+
+    getConnectionId() {
+        return this.connectionId;
+    }
+
+    onConnected(callback) {
+        alert('callBack');
+        if (this.connectionId) {
+            callback(this.connectionId);
+        } else {
+            this.onConnectedCallbacks.push(callback);
+        }
     }
 }
