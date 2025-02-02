@@ -7,14 +7,18 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Smooth.Shared.Configuration;
 using Smooth.Shop.Application.Contracts;
+using Smooth.Shop.Application.Managers;
 using Smooth.Shop.Configuration;
 using Smooth.Shop.Data;
 using Smooth.Shop.FakeData;
 using Smooth.Shop.Hubs;
+using Smooth.Shop.Infrastructure.Data;
+using Smooth.Shop.Infrastructure.Repos;
 using Smooth.Shop.Infrastructure.Services;
 
 namespace Smooth.Shop;
@@ -34,7 +38,21 @@ public class Program
         builder.Services
             .AddOptions<AzureStorageOptions>()
             .BindConfiguration(AzureStorageOptions.SectionName);
-        builder.Services.AddTransient<ISasTokenService, SasTokenService>();
+
+        builder.Services.AddDbContext<SmoothWebDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("SmoothShopConnectionString"),
+                sqlOptions =>
+                {
+                    sqlOptions.MigrationsAssembly("Smooth.Shop.Infrastructure");
+                }
+            )
+        );
+
+        builder.Services.AddScoped<UploadManager>();
+        builder.Services.AddScoped<ISasTokenService, SasTokenService>();
+        //builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepo<,>));
+
+        builder.Services.AddScoped<INewMediumRepo, NewMediumRepo>();
 
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {

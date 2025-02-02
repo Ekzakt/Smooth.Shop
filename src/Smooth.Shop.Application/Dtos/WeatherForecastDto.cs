@@ -1,4 +1,4 @@
-﻿namespace Smooth.Shop.Application.Models;
+﻿namespace Smooth.Shop.Application.Dtos;
 
 public class WeatherForecastDto
 {

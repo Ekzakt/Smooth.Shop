@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Smooth.Shop.Application.Models;
+using Smooth.Shop.Application.Dtos;
 using System.Text.Json;
 
 namespace Smooth.Shop.Controllers;
