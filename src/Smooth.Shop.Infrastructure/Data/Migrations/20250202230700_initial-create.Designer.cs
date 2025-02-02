@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Smooth.Shop.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Smooth.Shop.Infrastructure.Data;
 namespace Smooth.Shop.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(SmoothWebDbContext))]
-    partial class SmoothWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250202230700_initial-create")]
+    partial class initialcreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

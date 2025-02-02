@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Ekzakt.FileManager.Core" Version="0.1.6" />
+		<PackageReference Include="Ekzakt.Utilities" Version="0.2.33" />
 		<PackageReference Include="IdentityModel" Version="7.0.0" />
 	</ItemGroup>
 

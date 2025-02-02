@@ -1,13 +1,13 @@
 ﻿using Ekzakt.FileManager.Core.Contracts;
-using Ekzakt.FileManager.Core.Models.EventArgs;
-using Ekzakt.FileManager.Core.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Smooth.Shared.Extensions;
 using Smooth.Shop.Application.Contracts;
+using Smooth.Shop.Application.Managers;
+using Smooth.Shop.Application.Mappers;
 using Smooth.Shop.Application.Requests;
+using Smooth.Shop.Application.Services.FileNameComposer;
 using Smooth.Shop.Hubs;
-using System.Text.Json;
 using System.Web;
 
 namespace Smooth.Shop.Controllers;
@@ -18,18 +18,23 @@ public class FileController : Controller
     private readonly IEkzaktFileManager _fileManager;
     private readonly IHubContext<UploadHub> _hubContext;
     private readonly ISasTokenService _sasTokenService;
-
+    private readonly INewMediumRepo _newMediumRepository;
+    private readonly UploadManager _uploadManager;
 
     public FileController(
         ILogger<FileController> logger,
         IEkzaktFileManager fileManager,
         IHubContext<UploadHub> hubContext,
-        ISasTokenService sasTokenService)
+        ISasTokenService sasTokenService,
+        INewMediumRepo newMediumRepository,
+        UploadManager uploadManager)
     {
         _logger = logger;
         _fileManager = fileManager;
         _hubContext = hubContext;
         _sasTokenService = sasTokenService;
+        _newMediumRepository = newMediumRepository;
+        _uploadManager = uploadManager;
     }
 
 
@@ -46,15 +51,14 @@ public class FileController : Controller
 
 
     [HttpGet]
-    public IActionResult Sas(string fileName, string connectionId, CancellationToken cancellationToken)
+    public IActionResult Sas(SasTokenRequest sasTokenRequest, CancellationToken cancellationToken)
     {
-        var request = new SasTokenRequest
-        {
-            FileName = GetFileName(
-                HttpUtility.UrlDecode(fileName),
-                HttpUtility.UrlDecode(connectionId)),
-        };
+        var composedFileName = new UploadFileNameComposer().Compose(
+            HttpUtility.UrlDecode(sasTokenRequest.FileName),
+            HttpUtility.UrlDecode(sasTokenRequest.ConnectionId),
+            User.GetUserId());
 
+        var request = new SasTokenRequest { FileName = composedFileName };
         var response = _sasTokenService.GenerateSasToken(request);
 
         if (response.Success)
@@ -67,69 +71,17 @@ public class FileController : Controller
 
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Save(IFormFile file, string connectionId, string fileId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Confirm([FromBody] ConfirmUploadRequest uploadConfirmRequest, CancellationToken cancellationToken)
     {
-        if (file == null || file.Length == 0)
+        var confirmUploadDto = uploadConfirmRequest.ToDto();
+        var result = await _uploadManager.ConfirmUploadAsync(confirmUploadDto);
+
+        if (result.Succeeded)
         {
-            return BadRequest(new { Message = "No file chosen." });
+            return Ok(result.Data);
         }
 
-        using var fileStream = file.OpenReadStream();
+        return BadRequest(result.Messages);
 
-        var request = new SaveFileRequest
-        {
-            FileName = GetFileName(file.Name, connectionId),
-            FileStream = fileStream,
-            ProgressHandler = GetProgressHandler(connectionId, fileId),
-            InitialFileSize = fileStream.Length
-        };
-
-        var result = await _fileManager.SaveFileAsync(request, cancellationToken);
-
-        return StatusCode((int)result.Status, new
-        {
-            StatusCode = (int)result.Status,
-            Message = result.Message ?? "Unhandled status message."
-        });
     }
-
-
-    [HttpPost]
-    public IActionResult Confirm([FromBody] UploadConfirmRequest uploadConfirmRequest, CancellationToken cancellationToken)
-    {
-        var result = JsonSerializer.Serialize(uploadConfirmRequest, new JsonSerializerOptions { WriteIndented = true });
-
-        _logger.LogInformation($"Confirming upload of file: {result}");
-
-        return Ok();
-    }
-
-
-    #region Helpers
-
-    public Progress<ProgressEventArgs> GetProgressHandler(string connectionId, string fileId)
-    {
-        return new Progress<ProgressEventArgs>(async progress =>
-        {
-            await _hubContext.Clients.Client(connectionId)
-                .SendAsync("ReceiveProgress", new { fileId, progress.PercentageDone });
-        });
-    }
-
-
-    private string GetFileName(string originalFileName, string connectionId)
-    {
-        if (string.IsNullOrWhiteSpace(connectionId))
-        {
-            connectionId = "null";
-        }
-
-        var userId = User.GetUserId();
-        var fileName = $"{userId}__{connectionId}__{originalFileName}";
-
-        return fileName;
-    }
-
-    #endregion Helpers
 }

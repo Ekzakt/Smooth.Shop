@@ -12,17 +12,54 @@ public class NewMediumConfiguration : IEntityTypeConfiguration<NewMedium>
 
         builder.HasKey(m => m.Id);
 
-        builder.Property(m => m.Status)
+        builder.Property(m => m.UserId)
+            .HasColumnOrder(1)
             .IsRequired();
 
-        builder.Property(m => m.SessionId)
+        builder.Property(m => m.Id)
+            .ValueGeneratedOnAdd()
+            .UseIdentityColumn()
+            .HasColumnOrder(2);
+
+        builder.Property(m => m.Status)
+            .HasMaxLength(50)
+            .HasColumnOrder(3)
+            .IsRequired();
+
+        builder.Property(m => m.ConnectionId)
+            .HasColumnOrder(4)
             .IsRequired();
 
         builder.Property(m => m.OriginalFileName)
+            .HasColumnOrder(5)
+            .IsRequired();
+
+        builder.Property(m => m.UploadedFileName)
+            .HasColumnOrder(6)
+            .IsRequired();
+
+        builder.Property(m => m.FileSize)
+            .HasColumnOrder(7)
+            .IsRequired();
+
+        builder.Property(m => m.UploadStartedAt)
+            .HasColumnOrder(8)
+            .IsRequired();
+
+        builder.Property(m => m.UploadFinishedAt)
+            .HasColumnOrder(9)
+            .IsRequired();
+
+        builder.Property(m => m.UploadTimeMs)
+            .HasColumnOrder(10)
             .IsRequired();
 
         builder.Property(m => m.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()")
-            .ValueGeneratedOnAdd();
+            .HasColumnOrder(11)
+            .IsRequired();
+
+        builder.Property(m => m.UserId)
+            .HasColumnOrder(12)
+            .IsRequired();
     }
 }

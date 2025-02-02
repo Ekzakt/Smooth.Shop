@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Smooth.Shared.Configuration;
 using Smooth.Shop.Application.Contracts;
+using Smooth.Shop.Application.Managers;
 using Smooth.Shop.Configuration;
 using Smooth.Shop.Data;
 using Smooth.Shop.FakeData;
@@ -37,12 +38,21 @@ public class Program
         builder.Services
             .AddOptions<AzureStorageOptions>()
             .BindConfiguration(AzureStorageOptions.SectionName);
-        builder.Services.AddTransient<ISasTokenService, SasTokenService>();
 
         builder.Services.AddDbContext<SmoothWebDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("SmoothShopConnectionString")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("SmoothShopConnectionString"),
+                sqlOptions =>
+                {
+                    sqlOptions.MigrationsAssembly("Smooth.Shop.Infrastructure");
+                }
+            )
+        );
 
-        builder.Services.AddScoped<INewMediumRepository, NewMediumRepository>();
+        builder.Services.AddScoped<UploadManager>();
+        builder.Services.AddScoped<ISasTokenService, SasTokenService>();
+        //builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepo<,>));
+
+        builder.Services.AddScoped<INewMediumRepo, NewMediumRepo>();
 
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
