@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Smooth.Shared.Configuration;
@@ -39,6 +38,8 @@ public class Program
             .AddOptions<AzureStorageOptions>()
             .BindConfiguration(AzureStorageOptions.SectionName);
 
+        builder.AddCors();
+
         builder.Services.AddDbContext<SmoothWebDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("SmoothShopConnectionString"),
                 sqlOptions =>
@@ -50,7 +51,6 @@ public class Program
 
         builder.Services.AddScoped<UploadManager>();
         builder.Services.AddScoped<ISasTokenService, SasTokenService>();
-        //builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepo<,>));
 
         builder.Services.AddScoped<INewMediumRepo, NewMediumRepo>();
 
@@ -140,6 +140,7 @@ public class Program
         var app = builder.Build();
 
         app.UseForwardedHeaders();
+        app.UseCors(CorsOptions.POLICY_NAME);
 
         if (!app.Environment.IsDevelopment())
         {

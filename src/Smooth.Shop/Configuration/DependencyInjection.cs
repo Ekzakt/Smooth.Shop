@@ -1,10 +1,8 @@
 ﻿using Azure.Identity;
-using Smooth.Shared.Configuration;
 
 namespace Smooth.Shop.Configuration;
 
-
-public static class WebApplicationBuilderExtensions
+public static class DependencyInjection
 {
     public static WebApplicationBuilder AddAzureKeyVault(this WebApplicationBuilder builder)
     {
@@ -29,7 +27,29 @@ public static class WebApplicationBuilderExtensions
         return builder;
     }
 
+    public static WebApplicationBuilder AddCors(this WebApplicationBuilder builder)
+    {
+        CorsOptions options = new();
+        builder.Configuration
+            .GetSection(CorsOptions.SectionName)
+            .Bind(options);
 
+        var origins = options?.AllowedOrigins;
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(name: CorsOptions.POLICY_NAME,
+                policy =>
+                {
+                    policy.WithOrigins(origins ?? Array.Empty<string>());
+                    policy.AllowAnyHeader();
+                    policy.AllowAnyMethod();
+                    policy.AllowCredentials();
+                });
+        });
+
+        return builder;
+    }
     #region Helpers
 
     private static DefaultAzureCredentialOptions GetDefaultAzureCredentialOptions(WebApplicationBuilder builder)
