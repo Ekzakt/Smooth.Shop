@@ -13,6 +13,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Smooth.Shared.Application\Smooth.Shared.Application.csproj" />
 	  <ProjectReference Include="..\Smooth.Shop.Domain\Smooth.Shop.Domain.csproj" />
 	</ItemGroup>
 

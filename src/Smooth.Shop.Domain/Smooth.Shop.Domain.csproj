@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Smooth.Shared.Domain\Smooth.Shared.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

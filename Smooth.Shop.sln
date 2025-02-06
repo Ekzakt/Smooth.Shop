@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smooth.Shared.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smooth.Shared.Razor", "src\Smooth.Shared.Razor\Smooth.Shared.Razor.csproj", "{56E94AD6-4C11-45AA-AEF5-A3BCBAE1AE8A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smooth.Shop.Domain", "src\Smooth.Shop.Domain\Smooth.Shop.Domain.csproj", "{FB4EE656-5A0E-4DC4-B3CF-ADBE4D3D50E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{56E94AD6-4C11-45AA-AEF5-A3BCBAE1AE8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56E94AD6-4C11-45AA-AEF5-A3BCBAE1AE8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56E94AD6-4C11-45AA-AEF5-A3BCBAE1AE8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB4EE656-5A0E-4DC4-B3CF-ADBE4D3D50E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB4EE656-5A0E-4DC4-B3CF-ADBE4D3D50E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB4EE656-5A0E-4DC4-B3CF-ADBE4D3D50E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB4EE656-5A0E-4DC4-B3CF-ADBE4D3D50E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{C476DABE-E20C-497D-A4D0-3258F050EF70} = {C54AF4AA-2C52-4D2B-840C-74F4FC66F493}
 		{1D8331C0-5E39-4869-A049-E012454072DC} = {C54AF4AA-2C52-4D2B-840C-74F4FC66F493}
 		{56E94AD6-4C11-45AA-AEF5-A3BCBAE1AE8A} = {C54AF4AA-2C52-4D2B-840C-74F4FC66F493}
+		{FB4EE656-5A0E-4DC4-B3CF-ADBE4D3D50E3} = {C54AF4AA-2C52-4D2B-840C-74F4FC66F493}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AAAB33B6-9415-4E09-8DC5-6E96545BAD8C}

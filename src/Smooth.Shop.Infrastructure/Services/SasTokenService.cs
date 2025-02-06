@@ -1,10 +1,9 @@
-﻿using Azure.Storage.Sas;
-using Azure.Storage;
-using Smooth.Shop.Application.Contracts;
-using Smooth.Shop.Application.Responses;
-using Smooth.Shop.Application.Requests;
+﻿using Azure.Storage;
+using Azure.Storage.Sas;
 using Microsoft.Extensions.Options;
-using Smooth.Shared.Configuration;
+using Smooth.Shop.Application.Contracts;
+using Smooth.Shop.Application.Requests;
+using Smooth.Shop.Application.Responses;
 
 namespace Smooth.Shop.Infrastructure.Services;
 
