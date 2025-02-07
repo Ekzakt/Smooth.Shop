@@ -365,3 +365,8 @@ FodyWeavers.xsd
 
 /Smooth.Shop/appsettings.Development.json
 /src/Smooth.Shop/appsettings.Development.json
+/scripts/add-migration-shop.ps1
+/scripts/clean-local.ps1
+/scripts/clean-remote.ps1
+/scripts/clean.ps1
+/scripts/update-database.ps1
