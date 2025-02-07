@@ -1,5 +1,4 @@
 ﻿using Azure.Identity;
-using Smooth.Shared.Configuration;
 
 namespace Smooth.Shop.Configuration;
 

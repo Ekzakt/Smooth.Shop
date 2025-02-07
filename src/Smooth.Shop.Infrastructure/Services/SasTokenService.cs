@@ -1,6 +1,7 @@
 ﻿using Azure.Storage;
 using Azure.Storage.Sas;
 using Microsoft.Extensions.Options;
+using Smooth.Shared.Application.Configuration;
 using Smooth.Shop.Application.Contracts;
 using Smooth.Shop.Application.Requests;
 using Smooth.Shop.Application.Responses;

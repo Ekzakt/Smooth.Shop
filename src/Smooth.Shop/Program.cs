@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Smooth.Shared.Configuration;
+using Smooth.Shared.Application.Configuration;
 using Smooth.Shop.Application.Contracts;
 using Smooth.Shop.Application.Managers;
 using Smooth.Shop.Configuration;

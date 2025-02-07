@@ -1,7 +1,7 @@
 ﻿using Ekzakt.FileManager.Core.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Smooth.Shared.Extensions;
+using Smooth.Shared.Application.Extensions;
 using Smooth.Shop.Application.Contracts;
 using Smooth.Shop.Application.Managers;
 using Smooth.Shop.Application.Mappers;
